@@ -6,7 +6,7 @@ built for the purpose of collecting training data for the machine
 learning models and testing the capability of each trained
 model. Metrics were collected as time series data from three of the
 Raspberry Pis via Python scripts, with the fourth hosting a central
-Influx database for storing metrics samples,x and a monitoring
+Influx database for storing metrics samples, and a monitoring
 dashboard (Grafana) to display insights produced by the AI model, in
 addition to other information about the network. Metrics were also
 collected from the switch over SNMP, using the Influx SNMP plugin.
