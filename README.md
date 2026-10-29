@@ -44,3 +44,6 @@ TODO
 
 # Setting up the testing environment
 TODO - instructions for configuring the testing environment
+
+# Setting up the machine learning models
+TODO
