@@ -24,10 +24,18 @@ This repository contains all of the artifacts required for continued
 development and testing of the experimental predictive maintenance
 system:
 - Source code for the machine learning models (one-class SVM and LSTM)
-  in the `models` directory
+  in the `models` directory, in Jupyter notebook format (`ipynb`). The
+  results of the training and testing of these models are also
+  included in the notebooks, in graphical and tabular format.
 - Device collection scripts, (in the `scripts/collection` directory)
   which collect samples from each of the three monitored Raspberry Pi
-  devices every ten seconds.
+  devices every ten seconds. It is recommended to use version 2.1,
+  which supports the most metrics and is the most reliable version of
+  the script; however, older versions of the script may be used for
+  compatibility with older devices.
+- The anomaly pipeline script (`scripts/anomaly2influx.py`), which
+  is used to push predictions made by the anomaly detection models to the
+  Influx database in real time.
 - The YAML configuration file for the Influx SNMP plugin (also in the
   `scripts/collection` directory), used to query various metrics from
   the switch's MIB over SNMPv2 every ten seconds.
@@ -40,6 +48,15 @@ Pis and switch can be found [here] (TBD), as they are too large to be
 stored in this repository.
 
 # Dependencies
+## Software
+- Python 3
+- InfluxDB
+- Grafana
+## Libraries for the Python metrics collection scripts
+- `psutil`
+- `influxdb-client`
+- `zoneinfo`
+## Libraries for the machine learning models
 TODO
 
 # Setting up the testing environment
