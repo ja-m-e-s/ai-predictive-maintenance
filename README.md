@@ -53,7 +53,7 @@ stored in this repository.
 - InfluxDB
 - Grafana
 - Apache2
-## Libraries for the Python metrics collection scripts
+## Libraries for the collection scripts
 - `influxdb-client`
 - `psutil`
 - `requests`
