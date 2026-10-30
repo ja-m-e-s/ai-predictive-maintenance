@@ -52,15 +52,84 @@ stored in this repository.
 - Python 3
 - InfluxDB
 - Grafana
+- Apache2
 ## Libraries for the Python metrics collection scripts
-- `psutil`
 - `influxdb-client`
+- `psutil`
+- `requests`
 - `zoneinfo`
 ## Libraries for the machine learning models
 TODO
 
-# Setting up the testing environment
-TODO - instructions for configuring the testing environment
+# Configuration steps
+## Setting up the network environment
+1. Connect all devices (monitored devices and monitoring server) to
+   the switch, assign a static IP address to each device, and test
+   connectivity. Configure interfaces on the switch as necessary - all
+   devices should be on the same VLAN. Set up SSH on each device to
+   simplify configuration and maintenance.
+2. Install InfluxDB and Grafana on the device that will act as the
+   monitoring server; configure each using the configuration files
+   from this repository. Enable the `systemd` services if
+   necessary. Create a separate Influx bucket for each monitored
+   device.
+3. On the 'webserver' device, install Apache and enable the `systemd`
+   service (`sudo systemctl enable --now apache2`) to start the server
+   process. Confirm that the site is accessible by accessing it from
+   another device.
+4. On each 'client' device (which send random HTTP requests to the
+   'webserver' device to simulate network activity), upload the
+   `request.py` Python script (found in the `scripts`
+   directory). Modify the IP address in the script so that requests
+   are sent to the correct device. Install the `requests` Python
+   library and start the script in the background:
+   
+   ```
+   nohup python3 request.py &
+   ```
 
-# Setting up the machine learning models
+## Setting up metrics collection
+### End devices (Raspberry Pis)
+5. Upload the metrics collection Python script to each monitored
+   device (we did this over SFTP). Alter each script so that the
+   metrics are sent to the correct bucket on the monitoring
+   server. Generate a unique Influx token for each monitored device
+   and update the scripts accordingly.
+6. Install the remaining Python dependencies on each monitored device
+   using `pip`. Start the script in the background:
+   
+   ```
+   nohup python3 CollectorV2.1.py &
+   ```
+7. Using the Influx web interface, verify that metrics are being
+   pushed to the correct bucket on the database.
+### Switch 
+8. Connect to the switch over a console connection and enter global
+   configuration mode. Enable SNMPv2 using the following command:
+   
+   ```
+   snmp-server community password ro
+   ```
+9. On the Influx web interface, install the TOML configuration file
+   for the SNMP plugin. Generate a new Influx token for the
+   switch. Install `telegraf` on the monitoring server.
+10. On the monitoring server, execute the following command:
+
+	```
+	TODO...
+	```
+11. Verify that switch metrics are being collected by Influx.
+
+## Setting up the machine learning models and dashboard
 TODO
+
+# Specifications of monitored devices
+Health and performance metrics were monitored on the following devices
+during the development of the project:
+- Cisco Catalyst CX 3560-CX switch
+- Raspberry Pi 4 Model B (4GB) (Client 1)
+- Raspberry Pi 4 Model B (Client 2)
+- Raspberry Pi 3B+ (Webserver)
+
+In addition, the monitoring server (on which the Influx database
+and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
