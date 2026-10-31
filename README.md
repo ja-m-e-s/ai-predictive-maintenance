@@ -19,6 +19,8 @@ outputs of the anomaly detection model as a basis for device fault
 prediction. The machine learning models and collection scripts may
 also need to be refined in future.
 
+![System diagram](diagram.png)
+
 # Description of repository contents
 This repository contains all of the artifacts required for continued
 development and testing of the experimental predictive maintenance
@@ -53,7 +55,7 @@ stored in this repository.
 - InfluxDB
 - Grafana
 - Apache2
-## Libraries for the collection scripts
+## Libraries for the Python scripts
 - `influxdb-client`
 - `psutil`
 - `requests`
@@ -133,3 +135,24 @@ during the development of the project:
 
 In addition, the monitoring server (on which the Influx database
 and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
+
+# Metrics observed on the monitored devices
+## Raspberry Pis
+* Uptime (seconds)
+* CPU utilisation (%)
+* CPU temperature (C°)
+* CPU voltage
+* CPU clock speed (MHz)
+* Disk usage
+* Packet loss rate (%)
+* Packet error rate (%)
+* Latency (ms)
+* Throughput (bps)
+* Reachability
+* CPU throttled?
+* CPU speed capped?
+* Low voltage?
+* Estimated power draw (Watts)
+
+## Switch
+TODO
