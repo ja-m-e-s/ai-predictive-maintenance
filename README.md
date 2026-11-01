@@ -136,7 +136,7 @@ the following CSV files are required to run the machine learning models:
 
 python 3.12 or higher is recommended for running he machine elarning codes, aswell as an up to date vs code environment.
 
-### running models
+### Running models
 the models are stored in three jupyter notebook .ipynb files: the following notebooks runb the following models.
 
 - LSTM(all metrics) - runs LSTM model using all csv metrics
@@ -145,7 +145,7 @@ the models are stored in three jupyter notebook .ipynb files: the following note
 
 to run each model the user c an invidually run each cell or run all.
 
-### analysing findings
+### Analysing Findings
 
 to view result of all models without rerunning the code, each mdoels results are stored within folders.
 
@@ -153,11 +153,11 @@ to view result of all models without rerunning the code, each mdoels results are
 - LSTM (original metrics) - found in folder LSTM_Results
 - OCSVM(all + original metrics) - for all metric OCSVM found in folder OCSVM_All_Metrics_Results. for original metrics SVM found in folder OCSVM_Original_Results
 
-### connecting the machine learning best performing results to Graffana
+### Connecting ML Best Performing Results to Graffana
 
 Running the request script while connected to the system with an ethernet cable will send tghe result to the MLC1.1 bucket which can then be used in tangent with live telemetry
 
-# Specifications of monitored devices
+# Specifications of Monitored Devices
 Health and performance metrics were monitored on the following devices
 during the development of the project:
 - Cisco Catalyst CX 3560-CX switch
