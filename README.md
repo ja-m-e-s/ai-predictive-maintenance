@@ -123,7 +123,39 @@ TODO
 11. Verify that switch metrics are being collected by Influx.
 
 ## Setting up the machine learning models and dashboard
-TODO
+#Dependencies
+the following CSV files are required to run the machine learning models:
+- Client1(all)
+- Client2(all)
+- Client3(all)
+- Switch(all)
+- Client1(original)
+- Client2(original)
+- Client3(original)
+- Switch(original)
+
+python 3.12 or higher is recommended for running he machine elarning codes, aswell as an up to date vs code environment.
+
+#running models
+the models are stored in three jupyter notebook .ipynb files: the following notebooks runb the following models.
+
+- LSTM(all metrics) - runs LSTM model using all csv metrics
+- LSTM(original metrics) - runs LSTM model using core 7 metrics
+- OCSVM(all + original metrics) - runs OCSVM for both depending on which the user would like to by changing a variable from "original" to "all" or vice versa.
+
+to run each model the user c an invidually run each cell or run all.
+
+# analysing findings
+
+to view result of all models without rerunning the code, each mdoels results are stored within folders.
+
+- LSTM(all metrics) - found in folder Expanded_LSTM_Results
+- LSTM (original metrics) - found in folder LSTM_Results
+- OCSVM(all + original metrics) - for all metric OCSVM found in folder OCSVM_All_Metrics_Results. for original metrics SVM found in folder OCSVM_Original_Results
+
+#connecting the machine learning best performing results to Graffana
+
+Running the request script while connected to the system with an ethernet cable will send tghe result to the MLC1.1 bucket which can then be used in tangent with live telemetry
 
 # Specifications of monitored devices
 Health and performance metrics were monitored on the following devices
