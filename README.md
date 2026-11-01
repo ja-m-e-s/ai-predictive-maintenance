@@ -46,8 +46,8 @@ system:
   Pi, running an Apache2 server) at random every 0-30 seconds.
   
 The CSV files containing samples collected from the three Raspberry
-Pis and switch can be found [here] (TBD), as they are too large to be
-stored in this repository.
+Pis and switch can be accessed by contacting the project sponsor, as
+they are too large to be stored in this repository.
 
 # Dependencies
 ## Software
@@ -57,11 +57,18 @@ stored in this repository.
 - Apache2
 ## Libraries for the Python scripts
 - `influxdb-client`
+- `numpy`
+- `pandas`
 - `psutil`
 - `requests`
 - `zoneinfo`
 ## Libraries for the machine learning models
-TODO
+- `joblib`
+- `matplotlib`
+- `numpy`
+- `pandas`
+- `scikit-learn` (`sklearn`)
+- `tensorflow`
 
 # Configuration steps
 ## Setting up the network environment
@@ -124,38 +131,49 @@ TODO
 
 ## Setting up the machine learning models and dashboard
 ### Dependencies
-the following CSV files are required to run the machine learning models:
-- Client1(all)
-- Client2(all)
-- Client3(all)
-- Switch(all)
-- Client1(original)
-- Client2(original)
-- Client3(original)
-- Switch(original)
+The following CSV files were used to train and test the machine
+learning models:
+- Client1(all).csv
+- Client2(all).csv
+- Client3(all).csv
+- Switch(all).csv
+- Client1(original).csv
+- Client2(original).csv
+- Client3(original).csv
+- Switch(original).csv
+These files can be provided by the project sponsor upon request.
 
-python 3.12 or higher is recommended for running he machine elarning codes, aswell as an up to date vs code environment.
+Python 3.12 or higher is recommended for running the machine learning
+models, as well as an up to date VS Code environment.
 
 ### Running models
-the models are stored in three jupyter notebook .ipynb files: the following notebooks runb the following models.
+The models are stored in three Jupyter notebook (`.ipynb`) files: 
 
-- LSTM(all metrics) - runs LSTM model using all csv metrics
-- LSTM(original metrics) - runs LSTM model using core 7 metrics
-- OCSVM(all + original metrics) - runs OCSVM for both depending on which the user would like to by changing a variable from "original" to "all" or vice versa.
+- `LSTM(all metrics).ipynb` - runs LSTM model using all csv metrics
+- `LSTM(original metrics).ipynb` - runs LSTM model using core 7 metrics
+- `OCSVM(all + original metrics).ipynb` - runs OCSVM for both
+  depending on which the user would like, by changing a variable from
+  "original" to "all" or vice versa.
 
-to run each model the user c an invidually run each cell or run all.
+To run each model the user can run each cell individually, or run all.
 
-### Analysing Findings
+### Analysing findings
+To view the results of all models without rerunning the code, each
+model's results are stored within folders:
+- LSTM (all metrics) - found in folder `Expanded_LSTM_Results`
+- LSTM (original metrics) - found in folder `LSTM_Results`
+- OCSVM (all + original metrics) - found in folders
+  `OCSVM_All_Metrics_Results` (for all metrics) and
+  `OCSVM_Original_Results` (for original metrics)
 
-to view result of all models without rerunning the code, each mdoels results are stored within folders.
-
-- LSTM(all metrics) - found in folder Expanded_LSTM_Results
-- LSTM (original metrics) - found in folder LSTM_Results
-- OCSVM(all + original metrics) - for all metric OCSVM found in folder OCSVM_All_Metrics_Results. for original metrics SVM found in folder OCSVM_Original_Results
-
-### Connecting ML Best Performing Results to Graffana
-
-Running the request script while connected to the system with an ethernet cable will send tghe result to the MLC1.1 bucket which can then be used in tangent with live telemetry
+### Connecting models to Influx
+1. Create a new bucket on Influx to store the anomaly predictions (in
+   the script, a bucket named `MLCL1` is used by default.
+2. Generate a new Influx token and add it to `anomaly2influx.py` (or
+   as an environment variable on the machine on which the model is
+   hosted).
+3. Run the script (`python3 anomaly2influx.py`) to begin pushing
+   predictions to Influx.
 
 # Specifications of Monitored Devices
 Health and performance metrics were monitored on the following devices
