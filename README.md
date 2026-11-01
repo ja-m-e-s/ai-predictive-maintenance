@@ -207,5 +207,5 @@ and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
 ## Switch
 TODO
 
-##AI Usage
-###OpenAI's GPT-6 was guided to produce the machine learning models for the sake of clarity and structure. it was alos used to format the dataset files into more readable forms.
+## AI Usage
+### OpenAI's GPT-6 was guided to produce the machine learning models for the sake of clarity and structure. it was alos used to format the dataset files into more readable forms.
