@@ -6,18 +6,24 @@ built for the purpose of collecting training data for the machine
 learning models and testing the capability of each trained
 model. Metrics were collected as time series data from three of the
 Raspberry Pis via Python scripts, with the fourth hosting a central
-Influx database for storing metrics samples, and a monitoring
+InfluxDB instance for storing metrics samples, and a monitoring
 dashboard (Grafana) to display insights produced by the AI model, in
 addition to other information about the network. Metrics were also
-collected from the switch over SNMP, using the Influx SNMP plugin.
+collected from the switch over SNMP, using the Telegraf SNMP plugin
+for Influx.
 
 While we were able to develop an anomaly detection model to identify
 anomalies in device metrics over time, the system is not yet capable
-of predicting potential faults in the monitored devices. Therefore,
-future research efforts should be primarily focused on using the
-outputs of the anomaly detection model as a basis for device fault
-prediction. The machine learning models and collection scripts may
-also need to be refined in future.
+of predicting potential faults in the monitored devices. We were also
+unable to implement real-time anomaly detection - currently, the AI
+models rely on local CSV files, exported from the Influx database, to
+generate anomaly predictions, but the final system should be able to
+query samples directly from Influx for processing by the model.
+
+Therefore, future efforts should be focused on implementing real-time
+anomaly detection, and using the outputs of the anomaly detection
+model as a basis for device fault prediction. The machine learning
+models and collection scripts may also need to be refined in future.
 
 ![System diagram](diagram.png)
 
@@ -38,23 +44,33 @@ system:
 - The anomaly pipeline script (`scripts/anomaly2influx.py`), which
   is used to push predictions made by the anomaly detection models to the
   Influx database in real time.
-- The YAML configuration file for the Influx SNMP plugin (also in the
-  `scripts/collection` directory), used to query various metrics from
-  the switch's MIB over SNMPv2 every ten seconds.
 - The web traffic simulation script (`scripts/request.py`), which
   sends an HTTP request to one of the Raspberry Pis (the 'web server'
   Pi, running an Apache2 server) at random every 0-30 seconds.
+- The TOML configuration file for the Influx SNMP plugin
+  (`influx/switch_snmp.conf`), used to query various metrics from the
+  switch's MIB over SNMPv2 every ten seconds.
+- JSON configuration files for Grafana in the `grafana`
+  directory. `Machine learning dashboard.json` was used for a
+  dashboard that displays anomaly detection information about a
+  particular device. It is a template that can be used for all
+  monitored devices with minimal modification. `Client1
+  dashboard.json`, was used for a dashboard that displays other key
+  information about a particular device (e.g., latency,
+  throughput). This too can be used for all monitored devices
+  (provided they support the four metrics displayed on the dashboard).
   
-The CSV files containing samples collected from the three Raspberry
-Pis and switch can be accessed by contacting the project sponsor, as
-they are too large to be stored in this repository.
+CSV files containing samples collected from the three Raspberry Pis
+and switch can be accessed by contacting the project sponsor, as they
+are too large to be stored in this repository.
 
 # Dependencies
 ## Software
 - Python 3
-- InfluxDB
-- Grafana
-- Apache2
+- [InfluxDB](https://www.influxdata.com/products/influxdb/)
+- [Grafana](https://grafana.com/oss/grafana/)
+- [Apache2](https://httpd.apache.org/download.cgi)
+- [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 ## Libraries for the Python scripts
 - `influxdb-client`
 - `numpy`
@@ -78,8 +94,7 @@ they are too large to be stored in this repository.
    devices should be on the same VLAN. Set up SSH on each device to
    simplify configuration and maintenance.
 2. Install InfluxDB and Grafana on the device that will act as the
-   monitoring server; configure each using the configuration files
-   from this repository. Enable the `systemd` services if
+   monitoring server. Enable the `systemd` services if
    necessary. Create a separate Influx bucket for each monitored
    device.
 3. On the 'webserver' device, install Apache and enable the `systemd`
@@ -114,20 +129,40 @@ they are too large to be stored in this repository.
    pushed to the correct bucket on the database.
 ### Switch 
 8. Connect to the switch over a console connection and enter global
-   configuration mode. Enable SNMPv2 using the following command:
+   configuration mode. Configure an IP address on the default VLAN
+   (all devices on the network should be connected to this VLAN).
+9. Enable SNMPv2 on the switch using the following command:
    
    ```
    snmp-server community password ro
    ```
-9. On the Influx web interface, install the TOML configuration file
-   for the SNMP plugin. Generate a new Influx token for the
-   switch. Install `telegraf` on the monitoring server.
-10. On the monitoring server, execute the following command:
+   
+   Write the changes to memory (`copy run start`).
+10. On the Influx web interface, install the configuration file for
+   the SNMP plugin (`switch_snmp.conf`). Generate a new Influx token
+   for the switch. Update the IP addresses and Influx token in the
+   configuration file. Install `telegraf` on the monitoring server.
+11. On the monitoring server, execute the following command (replacing
+	`<token>` with a valid Influx token, and `<server_ip>` with the IP
+    address of the monitoring server):
 
 	```
-	TODO...
+	INFLUX_TOKEN=<token> nohup telegraf --config http://<server_ip>:8086/api/v2/telegrafs/11710df86cd1a000 &
 	```
-11. Verify that switch metrics are being collected by Influx.
+	
+	This command can also be generated automatically in the Influx web
+    interface - try doing it this way if you run into problems.
+12. Verify that switch metrics are being collected by Influx.
+
+## Setting up the dashboard
+1. Install Grafana on the monitoring server if it has not already been
+   installed.
+2. From the Grafana web interface (http://<server_ip>:3000), install
+   the two JSON dashboard configuration files for each monitored
+   device. Change the device name and other fields of the files as
+   necessary.
+3. Verify that real-time metrics from each monitored device are being
+   displayed on the dashboard. 
 
 ## Setting up the machine learning models and dashboard
 ### Dependencies
@@ -166,14 +201,14 @@ model's results are stored within folders:
   `OCSVM_All_Metrics_Results` (for all metrics) and
   `OCSVM_Original_Results` (for original metrics)
 
-### Connecting models to Influx
+### Sending anomaly detection information to Influx
 1. Create a new bucket on Influx to store the anomaly predictions (in
    the script, a bucket named `MLCL1` is used by default.
 2. Generate a new Influx token and add it to `anomaly2influx.py` (or
    as an environment variable on the machine on which the model is
    hosted).
 3. Run the script (`python3 anomaly2influx.py`) to begin pushing
-   predictions to Influx.
+   predictions to Influx.x
 
 # Specifications of Monitored Devices
 Health and performance metrics were monitored on the following devices
@@ -199,13 +234,23 @@ and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
 * Latency (ms)
 * Throughput (bps)
 * Reachability
-* CPU throttled?
-* CPU speed capped?
-* Low voltage?
+* CPU throttled (boolean)
+* CPU speed capped (boolean)
+* Low voltage (boolean)
 * Estimated power draw (Watts)
 
 ## Switch
-TODO
+* Uptime (seconds)
+* CPU usage (%)
+* Free memory (bytes)
+* Temperature (C°)
+* Power supply state
+* Inbound bytes count for each interface
+* Outbound bytes count for each interface
+* Inbound error count for each interface
+* Outbound error count for each interface
 
 ## AI Usage
-### OpenAI's GPT-6 was guided to produce the machine learning models for the sake of clarity and structure. it was alos used to format the dataset files into more readable forms.
+OpenAI's GPT-6 was used to produce the machine learning models for the
+sake of clarity and structure. It was also used to format the dataset
+files into more readable forms.
