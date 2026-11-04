@@ -1,4 +1,6 @@
-# Overview
+# AI-based predictive maintenance for network devices
+
+## Overview
 The objective of this project was to develop an AI-based predictive
 maintenance system to predict faults in network devices. A small
 isolated network, consisting of four Raspberry Pis and one switch, was
@@ -27,7 +29,7 @@ models and collection scripts may also need to be refined in future.
 
 ![System diagram](diagram.png)
 
-# Description of repository contents
+## Description of repository contents
 This repository contains all of the artifacts required for continued
 development and testing of the experimental predictive maintenance
 system:
@@ -64,21 +66,21 @@ CSV files containing samples collected from the three Raspberry Pis
 and switch can be accessed by contacting the project sponsor, as they
 are too large to be stored in this repository.
 
-# Dependencies
-## Software
+## Dependencies
+### Software
 - Python 3
 - [InfluxDB](https://www.influxdata.com/products/influxdb/)
 - [Grafana](https://grafana.com/oss/grafana/)
 - [Apache2](https://httpd.apache.org/download.cgi)
 - [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
-## Libraries for the Python scripts
+### Libraries for the Python scripts
 - `influxdb-client`
 - `numpy`
 - `pandas`
 - `psutil`
 - `requests`
 - `zoneinfo`
-## Libraries for the machine learning models
+### Libraries for the machine learning models
 - `joblib`
 - `matplotlib`
 - `numpy`
@@ -86,8 +88,8 @@ are too large to be stored in this repository.
 - `scikit-learn` (`sklearn`)
 - `tensorflow`
 
-# Configuration steps
-## Setting up the network environment
+## Configuration steps
+### Setting up the network environment
 1. Connect all devices (monitored devices and monitoring server) to
    the switch, assign a static IP address to each device, and test
    connectivity. Configure interfaces on the switch as necessary - all
@@ -112,8 +114,8 @@ are too large to be stored in this repository.
    nohup python3 request.py &
    ```
 
-## Setting up metrics collection
-### End devices (Raspberry Pis)
+### Setting up metrics collection
+#### End devices (Raspberry Pis)
 5. Upload the metrics collection Python script to each monitored
    device (we did this over SFTP). Alter each script so that the
    metrics are sent to the correct bucket on the monitoring
@@ -127,7 +129,7 @@ are too large to be stored in this repository.
    ```
 7. Using the Influx web interface, verify that metrics are being
    pushed to the correct bucket on the database.
-### Switch 
+#### Switch 
 8. Connect to the switch over a console connection and enter global
    configuration mode. Configure an IP address on the default VLAN
    (all devices on the network should be connected to this VLAN).
@@ -154,7 +156,7 @@ are too large to be stored in this repository.
     interface - try doing it this way if you run into problems.
 12. Verify that switch metrics are being collected by Influx.
 
-## Setting up the dashboard
+### Setting up the dashboard
 1. Install Grafana on the monitoring server if it has not already been
    installed.
 2. From the Grafana web interface (http://<server_ip>:3000), install
@@ -164,8 +166,8 @@ are too large to be stored in this repository.
 3. Verify that real-time metrics from each monitored device are being
    displayed on the dashboard. 
 
-## Setting up the machine learning models and dashboard
-### Dependencies
+### Setting up the machine learning models and dashboard
+#### Dependencies
 The following CSV files were used to train and test the machine
 learning models:
 - Client1(all).csv
@@ -181,7 +183,7 @@ These files can be provided by the project sponsor upon request.
 Python 3.12 or higher is recommended for running the machine learning
 models, as well as an up to date VS Code environment.
 
-### Running models
+#### Running models
 The models are stored in three Jupyter notebook (`.ipynb`) files: 
 
 - `LSTM(all metrics).ipynb` - runs LSTM model using all csv metrics
@@ -192,7 +194,7 @@ The models are stored in three Jupyter notebook (`.ipynb`) files:
 
 To run each model the user can run each cell individually, or run all.
 
-### Analysing findings
+#### Analysing findings
 To view the results of all models without rerunning the code, each
 model's results are stored within folders:
 - LSTM (all metrics) - found in folder `Expanded_LSTM_Results`
@@ -201,7 +203,7 @@ model's results are stored within folders:
   `OCSVM_All_Metrics_Results` (for all metrics) and
   `OCSVM_Original_Results` (for original metrics)
 
-### Sending anomaly detection information to Influx
+#### Sending anomaly detection information to Influx
 1. Create a new bucket on Influx to store the anomaly predictions (in
    the script, a bucket named `MLCL1` is used by default.
 2. Generate a new Influx token and add it to `anomaly2influx.py` (or
@@ -210,7 +212,7 @@ model's results are stored within folders:
 3. Run the script (`python3 anomaly2influx.py`) to begin pushing
    predictions to Influx.x
 
-# Specifications of Monitored Devices
+## Specifications of Monitored Devices
 Health and performance metrics were monitored on the following devices
 during the development of the project:
 - Cisco Catalyst CX 3560-CX switch
@@ -221,8 +223,8 @@ during the development of the project:
 In addition, the monitoring server (on which the Influx database
 and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
 
-# Metrics observed on the monitored devices
-## Raspberry Pis
+## Metrics observed on the monitored devices
+### Raspberry Pis
 * Uptime (seconds)
 * CPU utilisation (%)
 * CPU temperature (C°)
@@ -239,7 +241,7 @@ and Grafana dashboard were hosted) was a Raspberry Pi 3B+.
 * Low voltage (boolean)
 * Estimated power draw (Watts)
 
-## Switch
+### Switch
 * Uptime (seconds)
 * CPU usage (%)
 * Free memory (bytes)
